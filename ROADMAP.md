@@ -29,7 +29,7 @@ React 19 · TypeScript 6 · Vite 8 · Tailwind CSS v4 (`@tailwindcss/vite`) · D
 - [x] **Day 0.5 — Git & GitHub.** Re-rooted git at the project (home-folder repo disabled), hardened `.gitignore`, first clean commit, connected + pushed to `kahmedbscs25seecs-bot/sttudyplanner`.
 
 ### Phase 1 — Organizer foundation (the backbone)
-- [ ] **Day 1 — Real app shell.** Retire the Day-0 harness; layout (header + nav), view routing, dark theme, reusable UI primitives (Button, Card, Input). Empty Courses / Habits / Tasks views navigable.
+- [x] **Day 1 — Real app shell.** Retired the Day-0 harness; **React Router** (URL routing + back/deep-link), **responsive shell** (desktop sidebar + mobile bottom tabs), **light "technical-notebook" design system** (Space Grotesk / Inter / JetBrains Mono, cobalt `#3A4DE0` accent, tokens via Tailwind `@theme`), reusable UI primitives (Button, Card, Input, PageHeader, EmptyState). Empty Courses / Habits / Tasks views navigable + a NotFound route. Verified: build + lint clean, responsive + routing + focus ring checked in-browser.
 - [ ] **Day 2 — Courses (the spine).** Full CRUD over `Course` (code, name, credit hours, difficulty); clean list/grid. Everything links to a course.
 - [ ] **Day 3 — Habits.** CRUD + daily check-off + streaks + reorder; add a `completions` table (habitId + date).
 - [ ] **Day 4 — Tasks / Assignments.** New `Task` table (title, courseId, dueDate, status, notes); "due soon" sorting; mark complete.

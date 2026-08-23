@@ -12,7 +12,8 @@ export default defineConfig({
       manifest: {
         name: 'NUST Study App',
         short_name: 'StudyApp',
-        theme_color: '#0f172a',
+        theme_color: '#f5f7f8',
+        background_color: '#f5f7f8',
         icons: [
           {
             src: 'pwa-192x192.png',
