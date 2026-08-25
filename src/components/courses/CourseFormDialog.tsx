@@ -21,6 +21,12 @@ const CREDIT_HOUR_OPTIONS = [1, 2, 3, 4, 5, 6].map((hours) => ({
   label: String(hours),
 }));
 
+const COURSE_FIELDS: readonly string[] = ['code', 'name', 'creditHours', 'difficulty'];
+
+function isCourseField(field: string): field is keyof CourseInput {
+  return COURSE_FIELDS.includes(field);
+}
+
 const DEFAULT_CREDIT_HOURS = '3';
 const DEFAULT_DIFFICULTY = 3;
 
@@ -97,11 +103,17 @@ export function CourseFormDialog({ open, course, onClose }: CourseFormDialogProp
       onClose();
     } catch (error) {
       if (error instanceof ValidationError) {
-        // Assigned via a variable so the key stays a literal for TS.
-        const fieldErrors: FieldErrors = {};
-        fieldErrors[error.field] = error.message;
-        setErrors(fieldErrors);
-        focusField(error.field);
+        // The shared error type is open-ended (habits validate 'title', etc.);
+        // guard against THIS form's fields before routing to an input.
+        if (!isCourseField(error.field)) {
+          setFormError("Couldn't save this course. Please try again.");
+        } else {
+          // Assigned via a variable so the key stays a literal for TS.
+          const fieldErrors: FieldErrors = {};
+          fieldErrors[error.field] = error.message;
+          setErrors(fieldErrors);
+          focusField(error.field);
+        }
       } else if (error instanceof DuplicateCodeError) {
         setErrors({ code: error.message });
         focusField('code');

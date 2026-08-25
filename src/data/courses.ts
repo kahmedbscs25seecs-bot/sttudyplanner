@@ -1,5 +1,10 @@
 import { useLiveQuery } from 'dexie-react-hooks';
 import { db, type Course } from '../db';
+import { ValidationError } from './errors';
+
+// Shared field-scoped error type — re-exported so existing imports keep
+// working and `instanceof` stays identity across modules.
+export { ValidationError };
 
 /** What callers may set. `id` and `source` are owned by the data layer. */
 export interface CourseInput {
@@ -16,19 +21,6 @@ export class DuplicateCodeError extends Error {
     super(`Course code ${code} is already in use`);
     this.name = 'DuplicateCodeError';
     this.code = code;
-  }
-}
-
-/**
- * Field-scoped input rejection. `field` routes the error to a form control;
- * `message` is user-facing copy — render it verbatim next to that control.
- */
-export class ValidationError extends Error {
-  readonly field: keyof CourseInput;
-  constructor(field: keyof CourseInput, message: string) {
-    super(message);
-    this.name = 'ValidationError';
-    this.field = field;
   }
 }
 
