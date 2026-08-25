@@ -1,75 +1,61 @@
-# React + TypeScript + Vite
+# NUST Study App
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+A simple, organized, **local-first hub** that brings a NUST student's study life into one place — courses, assignments, habits, and per-course notes/links/past-papers. All data stays in your browser (IndexedDB); there is no server and no account.
 
-Currently, two official plugins are available:
+The master plan lives in [ROADMAP.md](./ROADMAP.md) — a living day-by-day tracker we update as we ship.
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+## Stack
 
-## React Compiler
+| Layer     | Choice                                              |
+| --------- | --------------------------------------------------- |
+| UI        | React 19 · TypeScript 6 (strict)                    |
+| Build     | Vite 8 · `vite-plugin-pwa` (installable + offline)  |
+| Styling   | Tailwind CSS v4 (`@theme` design tokens)            |
+| Data      | Dexie 4 over IndexedDB (local-first)                |
+| Icons     | lucide-react                                        |
+| Fonts     | Self-hosted variable fonts via Fontsource           |
+| Tests     | Vitest · React Testing Library · fake-indexeddb     |
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+## Getting started
 
-## Expanding the ESLint configuration
-
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
-
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
-
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-
+```bash
+npm install
+npm run dev        # start dev server
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+| Script            | What it does                                  |
+| ----------------- | --------------------------------------------- |
+| `npm run dev`     | Vite dev server with HMR                      |
+| `npm run build`   | Type-check (`tsc -b`) then production bundle  |
+| `npm run lint`    | ESLint with type-aware rules                  |
+| `npm test`        | Run all tests once (Vitest)                   |
+| `npm run test:watch` | Watch mode                                 |
+| `npm run preview` | Serve the production build locally            |
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
-
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+## Project structure
 
 ```
+src/
+├── components/
+│   ├── ErrorBoundary.tsx   # global crash screen with recovery actions
+│   └── ui/                 # Button, Card, Input, PageHeader, EmptyState
+├── layout/                 # app shell: Sidebar (desktop), BottomTabs (mobile)
+├── pages/                  # Dashboard, Courses, Habits, Tasks, NotFound
+├── test/                   # setup file + component/route tests
+├── db.ts                   # Dexie schema (single source of truth for data)
+├── index.css               # design tokens (@theme) + base styles
+└── main.tsx                # router + error boundary wiring
+```
+
+## Conventions
+
+- **Design tokens only** — use Tailwind utilities generated from `@theme` (`bg-paper`, `text-ink`, `text-muted`, `border-line`, `bg-accent`, `font-display`…); no raw hex values in components.
+- **TypeScript is strict**, including `noUncheckedIndexedAccess`.
+- **Reuse the UI primitives** in `components/ui/`; extend them rather than duplicating.
+- Navigation lives in one place: `src/layout/navItems.ts`.
+
+## How this repo is built
+
+Two-agent workflow: one agent plans & implements each increment ("Day N" in the roadmap), then a supervisor agent reviews it — running the full gate below, debugging failures, and fixing issues directly — before anything is committed.
+
+**Definition of done for every increment:** `lint` ✅ · `tsc -b` ✅ · `test` ✅ · `build` ✅ · checked responsive + keyboard-accessible in the browser.

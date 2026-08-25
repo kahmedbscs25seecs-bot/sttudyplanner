@@ -16,6 +16,7 @@ React 19 · TypeScript 6 · Vite 8 · Tailwind CSS v4 (`@tailwindcss/vite`) · D
 (local-first) · `vite-plugin-pwa` (installable/offline) · `lucide-react` icons · npm.
 
 ## 🤝 How we work
+- **Two-agent workflow** — Claude plans & implements each increment; **ox-alpha supervises**: reviews the working tree against the premium checklist, runs the verification gate, debugs failures, and applies fixes directly before commit.
 - **Build & explain** — code is written *and* explained (what + why) so it's a learning project.
 - **One day = one shippable increment = one commit + push** to GitHub.
 - Local-first & privacy-focused: all data stays in the browser (IndexedDB); no server.
@@ -30,7 +31,10 @@ React 19 · TypeScript 6 · Vite 8 · Tailwind CSS v4 (`@tailwindcss/vite`) · D
 
 ### Phase 1 — Organizer foundation (the backbone)
 - [x] **Day 1 — Real app shell.** Retired the Day-0 harness; **React Router** (URL routing + back/deep-link), **responsive shell** (desktop sidebar + mobile bottom tabs), **light "technical-notebook" design system** (Space Grotesk / Inter / JetBrains Mono, cobalt `#3A4DE0` accent, tokens via Tailwind `@theme`), reusable UI primitives (Button, Card, Input, PageHeader, EmptyState). Empty Courses / Habits / Tasks views navigable + a NotFound route. Verified: build + lint clean, responsive + routing + focus ring checked in-browser.
-- [ ] **Day 2 — Courses (the spine).** Full CRUD over `Course` (code, name, credit hours, difficulty); clean list/grid. Everything links to a course.
+- [x] **Day 1.5 — Foundation hardening (ox-alpha supervision pass).** Strict TS (+ `noUncheckedIndexedAccess`); global **ErrorBoundary** with recovery UI; **test infra** (Vitest + RTL + fake-indexeddb, 11 tests incl. DB CRUD round-trips); real **branded PWA icons** (192/512 + maskable) replacing the missing-file manifest entries and the leftover stock Vite favicon; fonts now **self-hosted** via Fontsource (offline-safe, no Google Fonts requests) and precached by the SW; ESLint upgraded to **type-checked** rules; README rewritten for the real project. Gate: lint · tsc · test · build all green.
+  - *Standing rule discovered:* fake-indexeddb injects generated keys into the input object — always pass fresh object literals to Dexie calls in tests.
+  - *Deferred to Day 3:* index `habits.order` when reorder lands (schema v2 bump).
+- [ ] **Day 2 — Courses (the spine).** Full CRUD over `Course` (code, name, credit hours, difficulty); clean list/grid. Everything links to a course. **Supervisor requirements:** duplicate-code validation at app level with inline error (Dexie can't enforce uniqueness); all Dexie calls failure-handled; forms keyboard-submittable with focus management; tests for CRUD + validation.
 - [ ] **Day 3 — Habits.** CRUD + daily check-off + streaks + reorder; add a `completions` table (habitId + date).
 - [ ] **Day 4 — Tasks / Assignments.** New `Task` table (title, courseId, dueDate, status, notes); "due soon" sorting; mark complete.
 
