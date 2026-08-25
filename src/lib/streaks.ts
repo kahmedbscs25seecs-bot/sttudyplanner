@@ -43,18 +43,23 @@ export function previousDayISO(iso: string): string {
  * yesterday's run still counts before today is done). The streak then counts
  * backwards through consecutive days from that latest completion.
  *
+ * Future-dated rows (clock drift) are ignored entirely: they cannot be real
+ * completions, so they must not suppress an otherwise-alive streak.
+ *
  * Tolerates unsorted and duplicate input. Examples (today = Wed):
  *   {}                    → 0
  *   {Wed}                 → 1
  *   {Tue}                 → 1   (grace)
  *   {Mon, Tue, Wed}       → 3
  *   {Mon}                 → 0   (Tue missed — grace does not extend two days)
+ *   {Thu, Wed}            → 1   (Thu is drift; Wed still counts)
  */
 export function currentStreak(dates: readonly string[], today?: string): number {
   if (dates.length === 0) return 0;
   const anchor = today ?? localDateISO();
 
-  const unique = [...new Set(dates)].sort();
+  // Drop future-dated rows first — they're clock-drift noise, not signal.
+  const unique = [...new Set(dates)].filter((date) => date <= anchor).sort();
   const latest = unique.at(-1);
   if (!latest || (latest !== anchor && latest !== previousDayISO(anchor))) {
     return 0;

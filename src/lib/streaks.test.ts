@@ -80,7 +80,13 @@ describe('currentStreak', () => {
     expect(currentStreak([WED, MON, WED, TUE], WED)).toBe(3);
   });
 
-  it('treats future-dated rows as dead (defensive against clock drift)', () => {
+  it('ignores future-dated rows instead of suppressing the streak', () => {
+    // Clock drift produced a "tomorrow" row; today's real completion must
+    // still count rather than being zeroed by noise.
+    expect(currentStreak(['2026-01-08', WED], WED)).toBe(1);
+  });
+
+  it('is 0 when ONLY future-dated rows exist', () => {
     expect(currentStreak(['2026-01-08'], WED)).toBe(0);
   });
 
