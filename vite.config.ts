@@ -43,6 +43,12 @@ export default defineConfig({
   ],
   test: {
     environment: 'jsdom',
-    setupFiles: './src/test/setup.ts'
+    setupFiles: './src/test/setup.ts',
+    // This dev machine runs several heavy apps alongside the gate; parallel
+    // file workers starve jsdom setups and turn timeouts into flakes.
+    // Serial files cost wall-clock minutes but keep the gate deterministic.
+    fileParallelism: false,
+    hookTimeout: 20000,
+    testTimeout: 20000
   }
 });
