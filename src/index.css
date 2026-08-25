@@ -24,6 +24,9 @@
   --color-accent: #3a4de0; /* cobalt — used sparingly */
   --color-accent-hover: #2e3eb8;
   --color-accent-tint: #eceefb; /* active-nav / icon wash */
+  --color-danger: #c4304a; /* validation errors, destructive actions */
+  --color-danger-hover: #a5253c;
+  --color-danger-tint: #fceef0;
 }
 
 @layer base {

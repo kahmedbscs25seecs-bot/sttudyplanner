@@ -19,10 +19,11 @@ describe('App shell', () => {
     ).toBeInTheDocument();
   });
 
-  it('renders the courses empty state at /courses', () => {
+  it('renders the courses empty state at /courses', async () => {
     renderAt('/courses');
+    // Courses now reads from IndexedDB, so the empty state arrives async.
     expect(
-      screen.getByRole('heading', { name: /no courses yet/i }),
+      await screen.findByRole('heading', { name: /no courses yet/i }),
     ).toBeInTheDocument();
   });
 
