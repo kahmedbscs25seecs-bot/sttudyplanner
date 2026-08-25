@@ -17,8 +17,10 @@ export interface Habit {
 }
 
 export class NUSTDatabase extends Dexie {
-  courses!: Table<Course>;
-  habits!: Table<Habit>;
+  // Key type params make auto-increment ids flow through Dexie's own typings
+  // (add() → Promise<number>) instead of every caller re-narrowing `any`.
+  courses!: Table<Course, number>;
+  habits!: Table<Habit, number>;
 
   constructor() {
     super('NUSTStudyAppDB');

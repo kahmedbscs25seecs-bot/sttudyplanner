@@ -51,7 +51,7 @@ React 19 · TypeScript 6 · Vite 8 · Tailwind CSS v4 (`@tailwindcss/vite`) · D
 ### Phase 4 — Integration / stretch (the ambitious vision)
 - [ ] Curated **NUST resource pack** (seed data by department/course).
 - [ ] **Integrate open-source study-app resources from GitHub** (scope concretely on arrival).
-- [ ] Optional **NUST LMS import** adapter (the `source:'lms'` hint already in the schema).
+- [ ] Optional **NUST LMS import** adapter (the `source:'lms'` hint already in the schema). **Invariant:** LMS writes must route through `src/data/courses.ts` (or normalize codes identically) — the case-insensitive duplicate guard assumes stored codes are trimmed + uppercase.
 - [ ] Notifications + simple analytics/charts.
 
 *The roadmap is a guide, not a contract — any day can be re-scoped as we learn.*

@@ -51,7 +51,10 @@ function validatedName(raw: string): string {
   const name = raw.trim();
   if (!name) throw new ValidationError('name', 'Name is required');
   if (name.length > NAME_MAX) {
-    throw new ValidationError('name', `Keep the name under ${NAME_MAX} characters`);
+    throw new ValidationError(
+      'name',
+      `Keep the name to ${NAME_MAX} characters or fewer`,
+    );
   }
   return name;
 }
@@ -89,16 +92,10 @@ export async function addCourse(raw: CourseInput): Promise<number> {
 
   // Single 'rw' transaction makes check-then-write atomic against other
   // writers (a second open tab counts). Throwing aborts the transaction.
-  // `add()` resolves to `any` (the table has no key type param), so the id
-  // is narrowed once before it leaves the transaction.
   return db.transaction('rw', db.courses, async (): Promise<number> => {
     const clash = await db.courses.where('code').equals(input.code).first();
     if (clash) throw new DuplicateCodeError(input.code);
-    const id: unknown = await db.courses.add({ ...input, source: 'manual' });
-    if (typeof id !== 'number') {
-      throw new Error('addCourse: IndexedDB returned a non-numeric key');
-    }
-    return id;
+    return db.courses.add({ ...input, source: 'manual' });
   });
 }
 

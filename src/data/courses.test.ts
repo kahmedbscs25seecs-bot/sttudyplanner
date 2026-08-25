@@ -75,6 +75,12 @@ describe('addCourse', () => {
     expect((err as ValidationError).field).toBe('name');
   });
 
+  it('accepts a name of exactly 80 characters (the stated limit)', async () => {
+    await expect(
+      addCourse({ ...VALID, name: 'x'.repeat(80) }),
+    ).resolves.toBeDefined();
+  });
+
   it.each([0, 7, 2.5])('rejects creditHours of %d', async (creditHours) => {
     const err = await addCourse({ ...VALID, creditHours }).catch((e: unknown) => e);
     expect(err).toBeInstanceOf(ValidationError);
