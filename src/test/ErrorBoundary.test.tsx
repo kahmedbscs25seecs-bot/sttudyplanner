@@ -23,7 +23,7 @@ describe('ErrorBoundary', () => {
   it('shows the recovery screen instead of a blank page on crash', () => {
     const consoleSpy = vi
       .spyOn(console, 'error')
-      .mockImplementation(() => {});
+      .mockImplementation(() => undefined);
 
     render(
       <ErrorBoundary>

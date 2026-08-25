@@ -9,6 +9,10 @@ export default defineConfig({
     tailwindcss(),
     VitePWA({
       registerType: 'autoUpdate',
+      workbox: {
+        // Include fonts/icons so typography renders fully offline.
+        globPatterns: ['**/*.{js,css,html,png,svg,woff2}']
+      },
       manifest: {
         id: '/',
         name: 'NUST Study App',
