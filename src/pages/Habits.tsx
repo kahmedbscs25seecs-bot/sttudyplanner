@@ -72,6 +72,9 @@ export function Habits() {
   const closeForm = () => setForm((prev) => ({ ...prev, open: false }));
 
   function toggle(habit: StoredHabit) {
+    // Clear BOTH banners: a stale delete failure must not mask (or outlive)
+    // this action's outcome.
+    setDeleteError(null);
     setActionError(null);
     setCompleted(habit.id, today, !isDone(habit)).catch(() => {
       setActionError("Couldn't save that check-off. Please try again.");
@@ -85,6 +88,7 @@ export function Habits() {
     const index = ids.indexOf(habit.id);
     const target = index + delta;
     if (index === -1 || target < 0 || target >= ids.length) return;
+    setDeleteError(null);
     setActionError(null);
     reorderHabits(swap(ids, index, target)).catch(() => {
       setActionError("Couldn't save that order. Please try again.");
@@ -94,6 +98,7 @@ export function Habits() {
   async function confirmDelete() {
     if (!pendingDelete) return;
     setDeleting(true);
+    setActionError(null);
     setDeleteError(null);
     try {
       await deleteHabit(pendingDelete.id); // cascades check-off history

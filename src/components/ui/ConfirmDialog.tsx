@@ -1,3 +1,4 @@
+import { useEffect, useRef } from 'react';
 import { Dialog } from './Dialog';
 import { Button } from './Button';
 
@@ -14,9 +15,10 @@ interface ConfirmDialogProps {
 }
 
 /**
- * Destructive-action confirmation. Cancel comes first in the DOM so it takes
- * initial focus inside the modal — the safe option is the one you get by
- * hitting Enter straight away.
+ * Destructive-action confirmation. Focus moves to Cancel whenever the dialog
+ * opens — the safe option is what you get by hitting Enter straight away.
+ * (Explicit effect, not DOM order: the header ✕ button is the first focusable
+ * element inside <dialog>, and native showModal() would pick it.)
  */
 export function ConfirmDialog({
   open,
@@ -27,11 +29,19 @@ export function ConfirmDialog({
   onCancel,
   busy = false,
 }: ConfirmDialogProps) {
+  const cancelRef = useRef<HTMLButtonElement>(null);
+
+  // Child effects run after Dialog's own (which calls showModal()), so
+  // focusing here sticks.
+  useEffect(() => {
+    if (open) cancelRef.current?.focus();
+  }, [open]);
+
   return (
     <Dialog open={open} onClose={onCancel} title={title}>
       <p className="text-sm text-muted">{message}</p>
       <div className="mt-5 flex justify-end gap-2">
-        <Button variant="secondary" onClick={onCancel} disabled={busy}>
+        <Button ref={cancelRef} variant="secondary" onClick={onCancel} disabled={busy}>
           Cancel
         </Button>
         <Button variant="danger" onClick={onConfirm} disabled={busy}>
