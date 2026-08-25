@@ -12,7 +12,7 @@ afterEach(cleanup);
  */
 describe('DifficultyPicker error wiring', () => {
   it('points every radio at the visible error message', () => {
-    render(<DifficultyPicker value={3} onChange={() => {}} error="Pick a difficulty" />);
+    render(<DifficultyPicker value={3} onChange={() => undefined} error="Pick a difficulty" />);
 
     const message = screen.getByText('Pick a difficulty');
     const radios = screen.getAllByRole('radio');
@@ -26,7 +26,7 @@ describe('DifficultyPicker error wiring', () => {
   });
 
   it('adds no error attributes when valid', () => {
-    render(<DifficultyPicker value={3} onChange={() => {}} />);
+    render(<DifficultyPicker value={3} onChange={() => undefined} />);
 
     for (const radio of screen.getAllByRole('radio')) {
       expect(radio).not.toHaveAttribute('aria-invalid');
