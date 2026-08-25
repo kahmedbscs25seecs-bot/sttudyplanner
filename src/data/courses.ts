@@ -19,11 +19,14 @@ export class DuplicateCodeError extends Error {
   }
 }
 
-/** Field-scoped input rejection — routes straight to a form field, no parsing. */
+/**
+ * Field-scoped input rejection. `field` routes the error to a form control;
+ * `message` is user-facing copy — render it verbatim next to that control.
+ */
 export class ValidationError extends Error {
   readonly field: keyof CourseInput;
   constructor(field: keyof CourseInput, message: string) {
-    super(`${field}: ${message}`);
+    super(message);
     this.name = 'ValidationError';
     this.field = field;
   }
@@ -33,7 +36,8 @@ export class ValidationError extends Error {
 // alphanumerically ("CS-101" ✓, "CS-" ✗), 2–10 chars after normalization.
 const CODE_PATTERN = /^[A-Z0-9][A-Z0-9-]{0,8}[A-Z0-9]$/;
 
-const NAME_MAX = 80;
+/** Longest allowed course name (post-trim). Exported so forms can set maxLength. */
+export const NAME_MAX = 80;
 
 // Per-field validators so partial patches can re-validate exactly what they carry.
 function validatedCode(raw: string): string {
