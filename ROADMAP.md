@@ -36,7 +36,7 @@ React 19 · TypeScript 6 · Vite 8 · Tailwind CSS v4 (`@tailwindcss/vite`) · D
   - *Deferred to Day 3:* index `habits.order` when reorder lands (schema v2 bump).
 - [ ] **Day 2 — Courses (the spine).** Full CRUD over `Course` (code, name, credit hours, difficulty); clean list/grid. Everything links to a course. **Supervisor requirements:** duplicate-code validation at app level with inline error (Dexie can't enforce uniqueness); all Dexie calls failure-handled; forms keyboard-submittable with focus management; tests for CRUD + validation.
 - [ ] **Day 3 — Habits.** CRUD + daily check-off + streaks + reorder; add a `completions` table (habitId + date).
-- [ ] **Day 4 — Tasks / Assignments.** New `Task` table (title, courseId, dueDate, status, notes); "due soon" sorting; mark complete.
+- [ ] **Day 4 — Tasks / Assignments.** New `Task` table (title, courseId, dueDate, status, notes); "due soon" sorting; mark complete. **Open decision before Day 4:** cascade-vs-orphan policy when deleting a course that tasks/resources still reference (raised in Day 2 plan review).
 
 ### Phase 2 — Resources hub (the north star)
 - [ ] **Day 5 — Resources per course.** New `Resource` table (title, url/file, type: note|link|past-paper|video|repo, courseId, tags). Organize resources under each course.
