@@ -2,6 +2,7 @@ import { useEffect, useRef, useState, type FormEvent } from 'react';
 import {
   addCourse,
   DuplicateCodeError,
+  NAME_MAX,
   updateCourse,
   ValidationError,
   type CourseInput,
@@ -22,22 +23,6 @@ const CREDIT_HOUR_OPTIONS = [1, 2, 3, 4, 5, 6].map((hours) => ({
 
 const DEFAULT_CREDIT_HOURS = '3';
 const DEFAULT_DIFFICULTY = 3;
-
-/**
- * `ValidationError.message` is prefixed with the field name — "code: Use 2–10
- * characters…" — which is right for a log but wrong beside a label that already
- * reads "Course code". Strips that prefix for display, falling back to the full
- * message if the data layer ever stops adding it.
- *
- * Raised with ox-alpha as a finding: the error should carry the bare message so
- * the UI doesn't have to reverse-engineer it. This goes away when it does.
- */
-function fieldMessage(error: ValidationError): string {
-  const prefix = `${error.field}: `;
-  return error.message.startsWith(prefix)
-    ? error.message.slice(prefix.length)
-    : error.message;
-}
 
 interface CourseFormDialogProps {
   open: boolean;
@@ -114,7 +99,7 @@ export function CourseFormDialog({ open, course, onClose }: CourseFormDialogProp
       if (error instanceof ValidationError) {
         // Assigned via a variable so the key stays a literal for TS.
         const fieldErrors: FieldErrors = {};
-        fieldErrors[error.field] = fieldMessage(error);
+        fieldErrors[error.field] = error.message;
         setErrors(fieldErrors);
         focusField(error.field);
       } else if (error instanceof DuplicateCodeError) {
@@ -154,6 +139,7 @@ export function CourseFormDialog({ open, course, onClose }: CourseFormDialogProp
           value={name}
           onChange={(event) => setName(event.target.value)}
           error={errors.name}
+          maxLength={NAME_MAX}
           autoComplete="off"
         />
         <Select
