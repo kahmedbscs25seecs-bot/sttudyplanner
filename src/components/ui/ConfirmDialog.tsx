@@ -31,8 +31,8 @@ export function ConfirmDialog({
 }: ConfirmDialogProps) {
   const cancelRef = useRef<HTMLButtonElement>(null);
 
-  // Child effects run after Dialog's own (which calls showModal()), so
-  // focusing here sticks.
+  // Child effects run before parent ones, so Dialog has already called
+  // showModal() by now and this focus sticks.
   useEffect(() => {
     if (open) cancelRef.current?.focus();
   }, [open]);

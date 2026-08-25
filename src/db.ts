@@ -23,12 +23,28 @@ export interface Completion {
   date: string;
 }
 
+export type TaskStatus = 'todo' | 'done';
+
+export interface Task {
+  id?: number;
+  title: string;
+  /** Absent = unassigned (a task can stand alone — hostel forms exist). */
+  courseId?: number;
+  /** Absent = no deadline; local calendar day, 'YYYY-MM-DD'. */
+  dueDate?: string;
+  status: TaskStatus;
+  notes?: string;
+  /** Local day the task was marked done — the Done section orders by it. */
+  completedAt?: string;
+}
+
 export class NUSTDatabase extends Dexie {
   // Key type params make auto-increment ids flow through Dexie's own typings
   // (add() → Promise<number>) instead of every caller re-narrowing `any`.
   courses!: Table<Course, number>;
   habits!: Table<Habit, number>;
   completions!: Table<Completion, [number, string]>;
+  tasks!: Table<Task, number>;
 
   constructor(name = 'NUSTStudyAppDB') {
     super(name);
@@ -58,6 +74,14 @@ export class NUSTDatabase extends Dexie {
           }
         }
       });
+    // v3 adds tasks. Indexes only where targeted lookups exist today
+    // (courseId: unassign + counts). The list itself reads toArray() and
+    // sorts in JS — optional fields (courseId/dueDate) are ABSENT on some
+    // rows, and IndexedDB omits absent-key records from indexes entirely,
+    // so orderBy('dueDate') would silently drop undated tasks.
+    this.version(3).stores({
+      tasks: '++id, courseId, dueDate, status'
+    });
   }
 }
 

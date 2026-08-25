@@ -116,6 +116,17 @@ describe('schema v1 → v2 upgrade', () => {
     expect(await upgraded.completions.count()).toBe(1);
   });
 
+  it('creates fresh databases directly at v3 (tasks table present)', async () => {
+    const fresh = track(new NUSTDatabase('test-fresh-v3'));
+    await fresh.open();
+    const id = await fresh.tasks.add({ title: 'First task', status: 'todo' });
+    expect(id).toBeGreaterThan(0);
+    const stored = await fresh.tasks.get(id);
+    // Optional indexed fields absent on purpose — the array-scan list path
+    // must still surface this row.
+    expect(stored).not.toHaveProperty('dueDate');
+  });
+
   it('creates fresh databases directly at v2', async () => {
     const fresh = track(new NUSTDatabase('test-fresh-v2'));
     await fresh.open();

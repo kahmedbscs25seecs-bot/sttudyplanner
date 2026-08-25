@@ -1,6 +1,6 @@
 import { ChevronDown, ChevronUp, Pencil, Trash2 } from 'lucide-react';
 import { Card } from '../ui/Card';
-import { HabitCheckoff } from './HabitCheckoff';
+import { Checkbox } from '../ui/Checkbox';
 import { HabitStreakBadge } from './HabitStreakBadge';
 import type { StoredHabit } from './types';
 
@@ -43,7 +43,7 @@ export function HabitRow({
 
   return (
     <Card className="flex items-center gap-3 p-4">
-      <HabitCheckoff done={done} label={`Mark "${title}" done for today`} onToggle={onToggle} />
+      <Checkbox checked={done} label={`Mark "${title}" done for today`} onToggle={onToggle} />
 
       <h3
         className={`min-w-0 flex-1 truncate font-display text-[0.95rem] font-semibold leading-snug ${

@@ -121,6 +121,13 @@ export async function updateCourse(id: number, rawPatch: Partial<CourseInput>): 
 }
 
 export async function deleteCourse(id: number): Promise<void> {
-  // Deleting an unknown id is already a silent no-op at the Dexie level.
-  await db.courses.delete(id);
+  // Unassign rather than destroy: tasks are user-authored content and must
+  // never vanish as a side effect (Day-3 deletion policy). They land in
+  // "Unassigned"; the UI's confirm dialog names the count beforehand.
+  await db.transaction('rw', db.courses, db.tasks, async () => {
+    await db.tasks.where('courseId').equals(id).modify((task) => {
+      delete task.courseId;
+    });
+    await db.courses.delete(id); // unknown id already a silent no-op
+  });
 }

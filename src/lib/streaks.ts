@@ -12,7 +12,9 @@ export function localDateISO(date: Date = new Date()): string {
   return `${year}-${month}-${day}`;
 }
 
-function parseISO(iso: string): { year: number; month: number; day: number } | null {
+/** Strict 'YYYY-MM-DD' parser. Exported: the shared definition of a valid
+ *  ISO date — dueDates.ts and the task validators consume it too. */
+export function parseISO(iso: string): { year: number; month: number; day: number } | null {
   const match = /^(\d{4})-(\d{2})-(\d{2})$/.exec(iso);
   if (!match) return null;
   return {
