@@ -10,13 +10,13 @@
 
 | Who | Role |
 |---|---|
-| **Khawa** (human) | Owner. Decides scope, breaks ties, operates both agents, gives final approval. |
-| **ox-alpha** (OpenCode) | **Planner** + **data/logic engineer** + reviewer of Claude's UI work. |
-| **Claude** (Claude Code) | **UI/frontend engineer** + reviewer of ox-alpha's plans and data work. |
+| **Khawa** (human) | Owner. Decides scope, breaks ties, approves plans, gates pushes to GitHub. |
+| **ox-alpha** (OpenCode) | **Implementer.** Builds data + UI to Claude's specs, writes the tests, runs the verification gate, merges when green. |
+| **Claude** (Claude Code) | **Planner.** Writes each day's plan (data contract, UI spec, test list) and reviews on request. |
 
-Neither agent is the other's boss. **Neither agent merges its own unreviewed work.**
-On disagreement: the verification gate (§5) is objective truth; if the gate is silent on it, the
-human decides.
+> **Workflow v2 (Day 4 onward):** one implementer, one planner. The green gate
+> (§5) is the review — Claude does not re-review every merge. Plans may not
+> change this agreement silently; proposals go through Khawa.
 
 ---
 
