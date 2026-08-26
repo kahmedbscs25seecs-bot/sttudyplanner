@@ -3,7 +3,10 @@ import userEvent from '@testing-library/user-event';
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 import { db } from '../db';
 import { addCourse } from '../data/courses';
+import { localDateISO } from '../lib/streaks';
 import { Courses } from '../pages/Courses';
+
+const TODAY = localDateISO();
 
 /** RTL auto-cleanup needs `globals: true`, which this project doesn't set. */
 afterEach(cleanup);
@@ -218,5 +221,42 @@ describe('deleting a course', () => {
 
     expect(await screen.findByRole('heading', { name: /no courses yet/i })).toBeInTheDocument();
     expect(await db.courses.count()).toBe(0);
+  });
+
+  it('keeps tasks when deleted — unassigned, with the count named up front', async () => {
+    const courseId = await addCourse({
+      code: 'CS-101',
+      name: 'Intro to Programming',
+      creditHours: 3,
+      difficulty: 2,
+    });
+    const user = userEvent.setup();
+    render(<Courses />);
+    await screen.findByText('CS-101');
+
+    // Two tasks hang off the course (one dated, one bare).
+    await db.tasks.bulkAdd([
+      { title: 'Assignment 1', status: 'todo', courseId, dueDate: TODAY },
+      { title: 'Loose ends', status: 'todo', courseId },
+    ]);
+    // Re-render so useTaskCountsByCourse sees the seeded tasks.
+    cleanup();
+    render(<Courses />);
+    await screen.findByText('CS-101');
+
+    await user.click(screen.getByRole('button', { name: 'Delete CS-101' }));
+    const dialog = inDialog();
+    expect(dialog.getByText(/its 2 tasks will be kept and moved to unassigned/i)).toBeInTheDocument();
+
+    await user.click(dialog.getByRole('button', { name: 'Delete course' }));
+    expect(
+      await screen.findByRole('heading', { name: /no courses yet/i }),
+    ).toBeInTheDocument();
+
+    expect(await db.courses.count()).toBe(0);
+    expect(await db.tasks.count()).toBe(2); // KEPT, not destroyed
+    for (const task of await db.tasks.toArray()) {
+      expect(task).not.toHaveProperty('courseId');
+    }
   });
 });

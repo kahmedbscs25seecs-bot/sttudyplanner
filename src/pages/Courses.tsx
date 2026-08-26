@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { BookOpen, Plus } from 'lucide-react';
 import { deleteCourse, useCourses } from '../data/courses';
+import { useTaskCountsByCourse } from '../data/tasks';
 import { Button } from '../components/ui/Button';
 import { Card } from '../components/ui/Card';
 import { ConfirmDialog } from '../components/ui/ConfirmDialog';
@@ -34,6 +35,7 @@ function CourseSkeleton() {
 
 export function Courses() {
   const courses = useCourses();
+  const taskCountsByCourse = useTaskCountsByCourse();
   const [form, setForm] = useState<FormState>({ open: false, session: 0 });
   const [pendingDelete, setPendingDelete] = useState<StoredCourse | null>(null);
   const [deleting, setDeleting] = useState(false);
@@ -64,6 +66,16 @@ export function Courses() {
       setDeleting(false);
     }
   }
+
+  // The confirm names the consequence: tasks are KEPT and moved to Unassigned
+  // (Day-3 deletion policy — user content is never destroyed as a side effect).
+  const pendingTaskCount = pendingDelete
+    ? (taskCountsByCourse?.get(pendingDelete.id) ?? 0)
+    : 0;
+  const taskSentence =
+    pendingTaskCount === 0
+      ? ''
+      : ` Its ${pendingTaskCount} ${pendingTaskCount === 1 ? 'task' : 'tasks'} will be kept and moved to Unassigned.`;
 
   const subtitle =
     stored && stored.length > 0
@@ -137,7 +149,7 @@ export function Courses() {
         title="Delete course?"
         message={
           pendingDelete
-            ? `${pendingDelete.code} — ${pendingDelete.name} will be removed. This can't be undone.`
+            ? `${pendingDelete.code} — ${pendingDelete.name} will be removed.${taskSentence} This can't be undone.`
             : ''
         }
         confirmLabel="Delete course"

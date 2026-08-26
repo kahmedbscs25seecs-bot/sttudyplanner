@@ -35,10 +35,11 @@ describe('App shell', () => {
     ).toBeInTheDocument();
   });
 
-  it('renders the tasks empty state at /tasks', () => {
+  it('renders the tasks empty state at /tasks', async () => {
     renderAt('/tasks');
+    // Tasks now reads from IndexedDB, so the empty state arrives async.
     expect(
-      screen.getByRole('heading', { name: /no tasks yet/i }),
+      await screen.findByRole('heading', { name: /no tasks yet/i }),
     ).toBeInTheDocument();
   });
 

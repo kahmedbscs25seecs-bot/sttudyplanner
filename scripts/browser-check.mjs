@@ -71,7 +71,68 @@ async function runChecks(page, BASE) {
     .catch(() => false);
   check('habits page reaches a settled state', habitsSettled);
 
+  // ── Tasks flow (Day 4): add w/ course+date → complete → Done → un-complete.
+  await page.goto(`${BASE}/tasks`, { waitUntil: 'networkidle0' });
+  const tasksUp = await page
+    .waitForFunction(
+      () => /no tasks yet|add your first task|task open/i.test(document.body.innerText),
+      { timeout: 15000 },
+    )
+    .then(() => true)
+    .catch(() => false);
+  check('tasks page reaches a settled state', tasksUp);
+
+  // Add a dated, course-less task via the form.
+  await page.click('::-p-text(Add your first task), ::-p-text(Add task)');
+  await page.waitForSelector('dialog[open]');
+  await page.keyboard.type('Browser check task');
+  await clickDialogButton(page, 'Add task');
+  await page.waitForFunction(() => document.body.innerText.includes('Browser check task'), {
+    timeout: 10000,
+  });
+  check('add task form submits and lists the row', true);
+
+  // Complete it — the row leaves its bucket and Done gains a count.
+  const taskBox = await page.waitForSelector('input[type=checkbox]');
+  await taskBox.click();
+  await page.waitForFunction(
+    () => /done\s*1/i.test(document.querySelector('summary')?.textContent ?? ''),
+    { timeout: 10000 },
+  );
+  check('completing a task moves it into Done (count visible)', true);
+
+  // Expand Done, un-complete — the row returns to a bucket.
+  await page.click('summary');
+  await page.waitForFunction(
+    () => [...document.querySelectorAll('input[type=checkbox]')].some((el) => el.checked),
+    { timeout: 10000 },
+  );
+  const checkedBox = await page.$('input[type=checkbox]:checked');
+  await checkedBox.click();
+  await page.waitForFunction(
+    () => {
+      // Success: row back in a bucket AND the Done section gone entirely
+      // (its <summary> vanishes when there are no completed tasks left).
+      const summaryGone = document.querySelector('summary') === null;
+      return (
+        document.body.innerText.includes('Browser check task') && summaryGone
+      );
+    },
+    { timeout: 10000 },
+  );
+  check('un-completing returns the row to its bucket', true);
+
   check('zero console errors', consoleErrors.length === 0, consoleErrors.join(' | ').slice(0, 300));
+}
+
+async function clickDialogButton(page, text) {
+  await page.evaluate((label) => {
+    const btn = [...document.querySelectorAll('dialog[open] button')].find(
+      (b) => b.textContent.trim() === label,
+    );
+    if (!btn) throw new Error(`no dialog button "${label}"`);
+    btn.click();
+  }, text);
 }
 
 async function waitForPort(port, tries = 30) {
