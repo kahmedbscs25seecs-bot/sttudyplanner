@@ -13,8 +13,11 @@ import {
   useTaskCountsByCourse,
   useTasks,
 } from './tasks';
+import { localDateISO } from '../lib/streaks';
 
-const TODAY = '2026-08-25';
+// Derived, never hardcoded: a frozen literal goes stale at midnight
+// (learned the hard way — completedAt stamps the REAL local day).
+const TODAY = localDateISO();
 
 beforeEach(async () => {
   await Promise.all([db.courses.clear(), db.tasks.clear()]);
